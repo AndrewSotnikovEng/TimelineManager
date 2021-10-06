@@ -1,0 +1,22 @@
+﻿<Window x:Class="TimelineManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TimelineManager"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="1000">
+    <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+        <StackPanel Width="60" Orientation="Vertical">
+            <Button Margin="10,20,0,0">Create</Button>
+            <Button Margin="10,20,0,0">Edit</Button>
+            <Button Margin="10,20,0,0">Delete</Button>
+        </StackPanel>
+        <StackPanel Margin="30,10,0,28.4" Width="880">
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Height="480" Margin="0,0,-0.4,0">
+                <Grid x:Name="MainContainer" Margin="20,5" VerticalAlignment="Top">
+                </Grid>
+            </ScrollViewer>
+        </StackPanel>
+    </StackPanel>
+</Window>
