@@ -8,13 +8,13 @@ namespace TimelineManager.Model
 {
     class AppProperties
     {
-        public int height { get; set; } = 20;
-        public int width { get; set; } = 20;
+        public static int height { get; set; } = 20;
+        public static int width { get; set; } = 20;
 
-        public int horizontalGap { get; set; } = 0;
+        public static int horizontalGap { get; set; } = 0;
 
-        public int initialHorizontalPosition { get; set; } = 30;
-        public int initialVerticalPosition { get; set; } = 30;
-        public int verticalGap { get; internal set; } = 10;
+        public static int initialHorizontalPosition { get; set; } = 30;
+        public  static int initialVerticalPosition { get; set; } = 30;
+        public static int verticalGap { get; internal set; } = 10;
     }
 }

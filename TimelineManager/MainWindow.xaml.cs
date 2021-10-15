@@ -22,6 +22,8 @@ namespace TimelineManager
     /// </summary>
     public partial class MainWindow : Window
     {
+        int _rowHorizontalPosition;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,60 +31,54 @@ namespace TimelineManager
 
             //Canvas canvas = this.MainCanvas;
 
-            int rowHorizontalPosition = prop.initialHorizontalPosition;
-            int rowVerticalPosition = prop.initialVerticalPosition;
+            int _rowHorizontalPosition = AppProperties.initialHorizontalPosition;
+            int rowVerticalPosition = AppProperties.initialVerticalPosition;
 
-            List<RowModel> rowList = new List<RowModel>();
+            vm = new ViewModel();
 
-            DateTime today = DateTime.Today;
-
-
-            rowList.Add(new RowModel(2, "Basement", today.AddDays(-159), today.AddDays(30), "Aqua"));
-            rowList.Add(new RowModel(3, "Wiring", today.AddDays(-118), today.AddDays(29), "Blue"));
-            rowList.Add(new RowModel(4, "Fence", today.AddDays(-117), today.AddDays(28), "Orange"));
-
-            DateTime startDate;
-            DateTime endDate;
-            TimeUtils.GetOutlineDates(rowList, out startDate, out endDate);
-
-            RowDefinition rowDefinition = new RowDefinition();
-            MainContainer.RowDefinitions.Add(rowDefinition);
+            DrawYear(vm.StartDate, vm.EndDate);
+            DrawMonth(vm.StartDate, vm.EndDate);
+            DrawData(vm.DataModel, vm.StartDate, vm.EndDate);
 
 
+        }
+
+        ViewModel vm;
+
+        private void DrawYear(DateTime startDate, DateTime endDate)
+        {
+            
             //year
-            RowModel label = new RowModel(0, "", startDate, endDate, "White");
+            
             int colCounter = 0;
             string prevYear = "";
             string curYear;
-            foreach (var c in DrawUtils.CreateCellsForRow(label, startDate, endDate))
+            foreach (var c in DrawUtils.CreateCellsForRow(vm.YearModel, startDate, endDate))
             {
                 ColumnDefinition colDefinition = new ColumnDefinition();
                 MainContainer.ColumnDefinitions.Add(colDefinition);
 
-                rowHorizontalPosition += prop.width + prop.horizontalGap;
+                _rowHorizontalPosition += AppProperties.width + AppProperties.horizontalGap;
 
                 TextBlock tb = new TextBlock();
-                tb.Height = prop.height;
-                tb.Width = prop.width;
+                tb.Height = AppProperties.height;
+                tb.Width = AppProperties.width;
 
                 curYear = TimeUtils.ParseYearFromId(c.cellId);
 
-                if (!String.IsNullOrEmpty(prevYear) && curYear != prevYear)
-                {
-                    tb.Text = curYear.Substring(2, 2);
-                }
 
-                
+                tb.Text = curYear.Substring(2, 2);
+
                 tb.Name = c.cellId;
                 tb.FontSize = 10;
                 tb.HorizontalAlignment = HorizontalAlignment.Center;
                 tb.VerticalAlignment = VerticalAlignment.Center;
 
-                tb.ToolTip = label.Name;
+                tb.ToolTip = vm.YearModel.Name;
 
                 DateTime dt = TimeUtils.ParseDateTimeFromId(c.cellId);
 
-                DateRange range = new DateRange(label.StartDate, label.EndDate);
+                DateRange range = new DateRange(vm.YearModel.StartDate, vm.YearModel.EndDate);
                 if (range.Includes(dt))
                 {
                     tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString(c.Color);
@@ -94,98 +90,35 @@ namespace TimelineManager
 
                 Grid.SetRow(tb, 0);
 
-                //if (prevMonth != curMonth)
-                //{
                 Grid.SetColumn(tb, colCounter);
                 prevYear = curYear;
-                //}
+
                 MainContainer.Children.Add(tb);
 
                 colCounter++;
             }
-            //MainContainer.Height = 1 * prop.height + prop.verticalGap;
+            
+        }
 
-
-
-
-            //month
-            rowDefinition = new RowDefinition();
-            MainContainer.RowDefinitions.Add(rowDefinition);
-            label = new RowModel(1, "", startDate, endDate, "White");
-            colCounter = 0;
-            string prevMonth = "";
-            string curMonth = "";
-            foreach (var c in DrawUtils.CreateCellsForRow(label, startDate, endDate))
-            {
-               
-                ColumnDefinition colDefinition = new ColumnDefinition();
-                MainContainer.ColumnDefinitions.Add(colDefinition);
-
-                rowHorizontalPosition += prop.width + prop.horizontalGap;
-
-                TextBlock tb = new TextBlock();
-                tb.Height = prop.height;
-                tb.Width = prop.width;
-
-                curMonth = TimeUtils.ParseMonthFromId(c.cellId);
-
-                if (!String.IsNullOrEmpty(prevMonth) && curMonth != prevMonth)
-                {
-                    tb.Text = curMonth;
-                }
-                
-                tb.Name = c.cellId;
-                tb.FontSize = 10;
-                tb.HorizontalAlignment = HorizontalAlignment.Center;
-                tb.VerticalAlignment = VerticalAlignment.Center;
-
-                tb.ToolTip = label.Name;
-
-                DateTime dt = TimeUtils.ParseDateTimeFromId(c.cellId);
-
-                DateRange range = new DateRange(label.StartDate, label.EndDate);
-                if (range.Includes(dt))
-                {
-                    tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString(c.Color);
-                }
-                else
-                {
-                    tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
-                }
-
-                Grid.SetRow(tb, 1);
-
-                //if (prevmonth != curmonth)
-                //{
-                    Grid.SetColumn(tb, colCounter);
-                    prevMonth = curMonth;
-                //}
-                MainContainer.Children.Add(tb);
-
-                colCounter++;
-            }
-            //MainContainer.Height = 2 * prop.height + prop.verticalGap;
-
-
-
-            //data
+        private void DrawData(List<RowModel> rowList, DateTime startDate, DateTime endDate)
+        {
             int rowCounter = 2;
             foreach (var row in rowList)
             {
-                rowDefinition = new RowDefinition();
+                RowDefinition rowDefinition = new RowDefinition();
                 MainContainer.RowDefinitions.Add(rowDefinition);
 
-                colCounter = 0;
+                int colCounter = 0;
                 foreach (var c in DrawUtils.CreateCellsForRow(row, startDate, endDate))
                 {
                     ColumnDefinition colDefinition = new ColumnDefinition();
                     MainContainer.ColumnDefinitions.Add(colDefinition);
 
-                    rowHorizontalPosition += prop.width + prop.horizontalGap;
+                    _rowHorizontalPosition += AppProperties.width + AppProperties.horizontalGap;
 
                     TextBlock tb = new TextBlock();
-                    tb.Height = prop.height;
-                    tb.Width = prop.width;
+                    tb.Height = AppProperties.height;
+                    tb.Width = AppProperties.width;
 
                     tb.Text = TimeUtils.ParseDayFromId(c.cellId);
                     tb.Name = c.cellId;
@@ -201,7 +134,8 @@ namespace TimelineManager
                     if (range.Includes(dt))
                     {
                         tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString(c.Color);
-                    } else
+                    }
+                    else
                     {
                         tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
                     }
@@ -213,8 +147,63 @@ namespace TimelineManager
                     colCounter++;
                 }
                 rowCounter++;
-                //MainContainer.Height = (rowCounter + 1) * ( prop.height + prop.verticalGap);
             }
+        }
+
+        private void DrawMonth(DateTime startDate, DateTime endDate)
+        {
+            RowDefinition rowDefinition = new RowDefinition();
+            MainContainer.RowDefinitions.Add(rowDefinition);
+
+            int colCounter = 0;
+            string prevMonth = "";
+            string curMonth;
+            foreach (var c in DrawUtils.CreateCellsForRow(vm.MonthModel, startDate, endDate))
+            {
+
+                ColumnDefinition colDefinition = new ColumnDefinition();
+                MainContainer.ColumnDefinitions.Add(colDefinition);
+
+                _rowHorizontalPosition += AppProperties.width + AppProperties.horizontalGap;
+
+                TextBlock tb = new TextBlock();
+                tb.Height = AppProperties.height;
+                tb.Width = AppProperties.width;
+
+                curMonth = TimeUtils.ParseMonthFromId(c.cellId);
+
+                tb.Text = curMonth;
+
+
+                tb.Name = c.cellId;
+                tb.FontSize = 10;
+                tb.HorizontalAlignment = HorizontalAlignment.Center;
+                tb.VerticalAlignment = VerticalAlignment.Center;
+
+                tb.ToolTip = vm.MonthModel.Name;
+
+                DateTime dt = TimeUtils.ParseDateTimeFromId(c.cellId);
+
+                DateRange range = new DateRange(vm.MonthModel.StartDate, vm.MonthModel.EndDate);
+                if (range.Includes(dt))
+                {
+                    tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString(c.Color);
+                }
+                else
+                {
+                    tb.Background = (SolidColorBrush)new BrushConverter().ConvertFromString("White");
+                }
+
+                Grid.SetRow(tb, 1);
+                Grid.SetColumn(tb, colCounter);
+                prevMonth = curMonth;
+
+                MainContainer.Children.Add(tb);
+
+                colCounter++;
+            }
+
+            //_rowHorizontalPosition = rowHorizontalPosition;
         }
     }
 }
